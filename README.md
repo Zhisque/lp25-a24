@@ -2,7 +2,7 @@
 
 ## Contexte
 
-Le projet consiste à construire une solution de sauvegarde incrémentale d'un répertoire source (le répertoire à sauvegarder) vers un répertoire cible (le répertoire de sauvegarde). La sauvegarde incrémentale reposera sur des liens symboliques.
+Le projet consiste à construire une solution de sauvegarde incrémentale d'un répertoire source (le répertoire à sauvegarder) vers un répertoire cible (le répertoire de sauvegarde). Il s'agit de développer un programme en langage C pour créer un outil de sauvegarde inspiré de Borg Backup, avec un accent sur la déduplication des données et la possibilité de réaliser des sauvegardes sur un serveur distant via des sockets.
 
 ## Architecture
 
