@@ -136,4 +136,4 @@ sont incorrects.
 	- `while (a == 3)`, `for (int i=0; i<3; ++i)`, `if (a == 3)` et `void ma_fonction(void)` sont corrects
 	- `while(a == 3 )`, `for ( i=0;i<3 ; ++i)`, `if ( a==3)` et `void ma_fonction (void )` sont incorrects
 - Basé sur les exemples ci dessus, également, les opérateurs sont précédés et suivis d'un espace, sauf dans la définition d'une boucle `for` où ils sont collés aux membres de droite et de gauche.
-- Le `;` qui sépare le
+- Le `;` qui sépare les termes de la boucle `for` ne prend pas d'espace avant, mais en prend un après.
