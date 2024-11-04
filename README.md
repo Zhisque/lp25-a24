@@ -12,6 +12,30 @@ Le projet comprend trois exécutables :
 - restore : restaure une sauvegarde
 - list : liste les éléments de la sauvegarde, notamment leurs versions
 
+```bash
+projet_lp25/
+│
+├── src/
+│   ├── main.c
+│   ├── file_handler.c
+│   ├── file_handler.h
+│   ├── deduplication.c
+│   ├── deduplication.h
+│   ├── compression.c
+│   ├── compression.h
+│   ├── encryption.c
+│   ├── encryption.h
+│   ├── archive_manager.c
+│   ├── archive_manager.h
+│   ├── network.c
+│   ├── network.h
+│
+├── Makefile
+├── README.md
+└── LICENSE
+
+```
+
 ### La commande `backup`
 
 La commande `backup` prend en paramètres (dans cet ordre) la source et la destination de la sauvegarde. Elle accepte les options suivantes :
