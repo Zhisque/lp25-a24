@@ -21,27 +21,29 @@ projet_lp25/
 │   ├── file_handler.h
 │   ├── deduplication.c
 │   ├── deduplication.h
-│   ├── compression.c
-│   ├── compression.h
-│   ├── encryption.c
-│   ├── encryption.h
-│   ├── archive_manager.c
-│   ├── archive_manager.h
+│   ├── backup_manager.c
+│   ├── backup_manager.h
 │   ├── network.c
-│   ├── network.h
-│
+│   └── network.h
 ├── Makefile
-├── README.md
-└── LICENSE
+└── README.md
 
 ```
 
-### La commande `backup`
+## Options du programme
+- `--backup` : crée une nouvelle sauvegarde du répertoire source, localement ou sur le serveur distant
+- `--restore` : restaure une sauvegarde à partir du chemin, localement ou depuis le serveur
+- `--list-backups` : liste toutes les sauvegardes existantes, localement ou sur le serveur
+- `--dry-run` : test une sauvegarde ou une restauration sans effectuer de réelles copies
+- `--d-server` : spécifie l'adresse IP du serveur à utiliser comme destination
+- `--d-port` : spécifie l'e port du serveur de destination
+- `--s-server` : spécifie l'adresse IP du serveur à utiliser comme source
+- `--s-port` : spécifie le port du serveur source
+- `--dest` : spécifie le chemin de destination de la sauvegarde ou de la restauration
+- `--source` : spécifie le chemin source de la sauvegarde ou de la restauration
+- `--verbose` ou `v` : affiche plus d'informations sur l'exécution du programme
 
-La commande `backup` prend en paramètres (dans cet ordre) la source et la destination de la sauvegarde. Elle accepte les options suivantes :
-
-- `--dry-run` pour tester quelles copies seront effectuées
-- `--verbose` ou `-v` pour afficher plus d'informations sur l'exécution du programme.
+### L'option `--backup`
 
 `backup` commence par effectuer une copie complète de la dernière sauvegarde, par liens durs, avec la date et l'heure actuelles comme nom, sous le format `"YYYY-MM-DD-hh:mm:ss.sss"` où :
 
@@ -66,9 +68,9 @@ Le programme fait ensuite la sauvegarde en suivant les règles ci-dessous :
 	- la taille est différente et le contenu est différent
 - un fichier de la destination est supprimé s'il n'existe plus dans la source
 
-### La commande `restore`
+### L'option `--restore`
 
-### La commande `list`
+### L'option `--list-backups`
 
 ## Points notables
 
@@ -77,9 +79,6 @@ Le programme fait ensuite la sauvegarde en suivant les règles ci-dessous :
 - copie par lien dur avec `link`
 - date : combinaison de `gettimeofday` avec `localtime` et `strftime`
 
-# Proposition pour optimiser le déroulement
-
-Proposer une idée d'amélioration (sans l'implémenter) du cheminement des requêtes et réponses pour que le programme s'exécute plus rapidement.
 
 # Modalités d'évaluation
 
