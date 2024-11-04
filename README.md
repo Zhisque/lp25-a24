@@ -6,11 +6,12 @@ Le projet consiste à construire une solution de sauvegarde incrémentale d'un r
 
 ## Architecture
 
-Le projet comprend trois exécutables :
+Le projet comprend quatres modules :
 
-- backup : réalise la sauvegarde
-- restore : restaure une sauvegarde
-- list : liste les éléments de la sauvegarde, notamment leurs versions
+- file_handler : Gère les opérations de fichier telles que la lecture, l'écriture et la liste des fichiers dans un répertoire de même que les répertoires
+- deduplication : Lors de la sauvegarde,implémente la lecture des fichiers en chunks, calcule leur MD5, et comparant ces sommes pour identifier les bloc de données doublons
+- backup_manager : Implémente la logique de gestion de sauvegarde incrémentale
+- network : Implémente les fonctionnalités de communication réseau en permettant l'envoi de données à un serveur distant et la réception de données à partir d'un port spécifié. Les sockets TCP sont implémentés pour établir des connexions entre le client et le serveur
 
 ```bash
 projet_lp25/
@@ -31,17 +32,20 @@ projet_lp25/
 ```
 
 ## Options du programme
+Le programme dispose de plusieurs options :
+
 - `--backup` : crée une nouvelle sauvegarde du répertoire source, localement ou sur le serveur distant
 - `--restore` : restaure une sauvegarde à partir du chemin, localement ou depuis le serveur
 - `--list-backups` : liste toutes les sauvegardes existantes, localement ou sur le serveur
 - `--dry-run` : test une sauvegarde ou une restauration sans effectuer de réelles copies
 - `--d-server` : spécifie l'adresse IP du serveur à utiliser comme destination
-- `--d-port` : spécifie l'e port du serveur de destination
+- `--d-port` : spécifie le port du serveur de destination
 - `--s-server` : spécifie l'adresse IP du serveur à utiliser comme source
 - `--s-port` : spécifie le port du serveur source
 - `--dest` : spécifie le chemin de destination de la sauvegarde ou de la restauration
 - `--source` : spécifie le chemin source de la sauvegarde ou de la restauration
 - `--verbose` ou `v` : affiche plus d'informations sur l'exécution du programme
+
 
 ### L'option `--backup`
 
