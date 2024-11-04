@@ -73,8 +73,23 @@ Le programme fait ensuite la sauvegarde en suivant les règles ci-dessous :
 - un fichier de la destination est supprimé s'il n'existe plus dans la source
 
 ### L'option `--restore`
+L'option `--restore` permet de restaurer une sauvegarde à partir d'un chemin spécifié, que ce soit localement ou depuis un serveur distant. La restauration peut être effectuée en utilisant les informations sur la sauvegarde disponible dans le répertoire de destination ou à travers une connexion réseau.
+
+1. Le programme vérifie si le chemin de la sauvegarde spécifié existe et est accessible. Si le chemin est sur un serveur, il établit une connexion via les sockets. 
+2. Les fichiers de la sauvegarde sont extraits et copiés dans le répertoire de destination spécifié, ou dans le répertoire par défaut si aucune destination n'est fournie.
+3. Si un fichier restauré existe déjà dans la destination, le programme effectue les vérifications suivantes avant de remplacer le fichier :
+	- Si la date de modification du fichier source est postérieure à celle du fichier de destination, il est remplacé.
+ 	- Si la taille des fichiers diffère, le fichier de destination est également remplacé.
+4. Le programme notifie l'utilisateur du succès ou des échecs de chaque opération de restauration. Si l'option `--verbose` est activée, il affiche des messages détaillés.
 
 ### L'option `--list-backups`
+L'option `--list-backups` permet d'afficher toutes les sauvegardes existantes, que ce soit localement ou sur un serveur distant. Cette fonctionnalité est utile pour que l'utilisateur puisse voir les archives de sauvegarde disponibles et décider laquelle restaurer.
+
+1. Le programme vérifie si l'option d'adresse de serveur a été fournie. Si oui, il établit une connexion avec le serveur spécifié pour récupérer la liste des sauvegardes.
+2. Si aucune adresse de serveur n'est fournie, le programme listera toutes les sauvegardes disponibles dans le répertoire par défaut (ou spécifié par l'utilisateur).
+3. Chaque archive de sauvegarde est affichée avec des détails pertinents, tels que le nom de la sauvegarde, la date de création, et la taille.
+4. Si l'option `--verbose` est activée, des informations supplémentaires peuvent être affichées, comme le chemin complet des fichiers de sauvegarde ou des informations sur la connexion réseau.
+
 
 ## Points notables
 
