@@ -34,9 +34,9 @@ projet_lp25/
 ## Options du programme
 Le programme dispose de plusieurs options :
 
-- `--backup` : crée une nouvelle sauvegarde du répertoire source, localement ou sur le serveur distant
-- `--restore` : restaure une sauvegarde à partir du chemin, localement ou depuis le serveur
-- `--list-backups` : liste toutes les sauvegardes existantes, localement ou sur le serveur
+- `--backup` : crée une nouvelle sauvegarde du répertoire source, localement ou sur le serveur distant. Ne s'utilise pas avec les options `--restore` et `--list-backups`
+- `--restore` : restaure une sauvegarde à partir du chemin, localement ou depuis le serveur. Ne s'utilise pas avec les options `--backup` et `--list-backups`
+- `--list-backups` : liste toutes les sauvegardes existantes, localement ou sur le serveur. Ne s'utilise pas avec les options `--restore` et `--backup`
 - `--dry-run` : test une sauvegarde ou une restauration sans effectuer de réelles copies
 - `--d-server` : spécifie l'adresse IP du serveur à utiliser comme destination
 - `--d-port` : spécifie le port du serveur de destination
@@ -83,11 +83,11 @@ L'option `--restore` permet de restaurer une sauvegarde à partir d'un chemin sp
 4. Le programme notifie l'utilisateur du succès ou des échecs de chaque opération de restauration. Si l'option `--verbose` est activée, il affiche des messages détaillés.
 
 ### L'option `--list-backups`
-L'option `--list-backups` permet d'afficher toutes les sauvegardes existantes, que ce soit localement ou sur un serveur distant. Cette fonctionnalité est utile pour que l'utilisateur puisse voir les archives de sauvegarde disponibles et décider laquelle restaurer.
+L'option `--list-backups` permet d'afficher toutes les sauvegardes existantes, que ce soit localement ou sur un serveur distant. Cette fonctionnalité est utile pour que l'utilisateur puisse voir toutes les sauvegardes disponibles et décider laquelle restaurer.
 
-1. Le programme vérifie si l'option d'adresse de serveur a été fournie. Si oui, il établit une connexion avec le serveur spécifié pour récupérer la liste des sauvegardes.
+1. Le programme vérifie si l'option `--s-server` serveur a été fournie. Si oui, il établit une connexion avec le serveur spécifié pour récupérer la liste des sauvegardes.
 2. Si aucune adresse de serveur n'est fournie, le programme listera toutes les sauvegardes disponibles dans le répertoire par défaut (ou spécifié par l'utilisateur).
-3. Chaque archive de sauvegarde est affichée avec des détails pertinents, tels que le nom de la sauvegarde, la date de création, et la taille.
+3. Chaque sauvegarde est affichée avec des détails, tels que le nom de la sauvegarde, la date de création, et la taille.
 4. Si l'option `--verbose` est activée, des informations supplémentaires peuvent être affichées, comme le chemin complet des fichiers de sauvegarde ou des informations sur la connexion réseau.
 
 
@@ -97,7 +97,6 @@ L'option `--list-backups` permet d'afficher toutes les sauvegardes existantes, q
 - suppression avec `unlink`
 - copie par lien dur avec `link`
 - date : combinaison de `gettimeofday` avec `localtime` et `strftime`
-
 
 # Modalités d'évaluation
 
