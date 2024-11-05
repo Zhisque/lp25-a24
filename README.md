@@ -8,10 +8,10 @@ Le projet consiste à construire une solution de sauvegarde incrémentale d'un r
 
 Le projet comprend quatres modules :
 
-- file_handler : Gère les opérations de fichier telles que la lecture, l'écriture et la liste des fichiers dans un répertoire de même que les répertoires
-- deduplication : Lors de la sauvegarde,implémente la lecture des fichiers en chunks, calcule leur MD5, et comparant ces sommes pour identifier les bloc de données doublons
-- backup_manager : Implémente la logique de gestion de sauvegarde incrémentale
-- network : Implémente les fonctionnalités de communication réseau en permettant l'envoi de données à un serveur distant et la réception de données à partir d'un port spécifié. Les sockets TCP sont implémentés pour établir des connexions entre le client et le serveur
+- **file_handler** : Gère les opérations de fichier telles que la lecture, l'écriture et la liste des fichiers dans un répertoire de même que les répertoires
+- **deduplication** : Lors de la sauvegarde,implémente la lecture des fichiers en chunks, calcule leur MD5, et compare ces sommes pour identifier les bloc de données doublons
+- **backup_manager** : Implémente la logique de gestion de sauvegarde incrémentale
+- **network** : Implémente les fonctionnalités de communication réseau en permettant l'envoi de données à un serveur distant et la réception de données à partir d'un port spécifié. Les sockets TCP sont implémentés pour établir des connexions entre le client et le serveur
 
 ```bash
 projet_lp25/
