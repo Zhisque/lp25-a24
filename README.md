@@ -4,7 +4,7 @@
 
 Le projet consiste à construire une solution de sauvegarde incrémentale d'un répertoire source (le répertoire à sauvegarder) vers un répertoire cible (le répertoire de sauvegarde). Il s'agit de développer un programme en langage C pour créer un outil de sauvegarde inspiré de Borg Backup, avec un accent sur la déduplication des données et la possibilité de réaliser des sauvegardes sur un serveur distant via des sockets.
 
-## Quelques définitions
+## Quelques explications
 
 - **Sauvegarde Incrémentale** : Contrairement à la sauvegarde complète qui sauvegarde à chaque itération l'ensemble des données de départ, la sauvegarde incrémentale ne sauvegarde que ce qui a changé. Lorsqu'il faut sauvegarder un dossier contenant 20 fichiers alors qu'un seul fichier a été modifié parmi les 20, la sauvegarde complète va de nouveau sauvegarder l'ensemble du dossier alors que la sauvegarde incrémentale ne va sauvegarder que le fichier qui a changé.
 - **Déduplication** : La déduplication est un principe de sauvegarde qui consiste à identifier et supprimer dans un ensemble de données et en ne sauvegardant chaque bloc unique (*chunk*) qu'une seule fois. Les blocs qui se répètent sont remplacés par des références pointant vers les blocs déjà sauvegardés.
