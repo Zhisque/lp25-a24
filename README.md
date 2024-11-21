@@ -4,6 +4,16 @@
 
 Le projet consiste à construire une solution de sauvegarde incrémentale d'un répertoire source (le répertoire à sauvegarder) vers un répertoire cible (le répertoire de sauvegarde). Il s'agit de développer un programme en langage C pour créer un outil de sauvegarde inspiré de Borg Backup, avec un accent sur la déduplication des données et la possibilité de réaliser des sauvegardes sur un serveur distant via des sockets.
 
+## Quelques définitions
+
+- **Sauvegarde Incrémentale** : Contrairement à la sauvegarde complète qui sauvegarde à chaque itération l'ensemble des données de départ, la sauvegarde incrémentale ne sauvegarde que ce qui a changé. Lorsqu'il faut sauvegarder un dossier contenant 20 fichiers alors qu'un seul fichier a été modifié parmi les 20, la sauvegarde complète va de nouveau sauvegarder l'ensemble du dossier alors que la sauvegarde incrémentale ne va sauvegarder que le fichier qui a changé.
+- **Déduplication** : La déduplication est un principe de sauvegarde qui consiste à identifier et supprimer dans un ensemble de données et en ne sauvegardant chaque bloc unique (*chunk*) qu'une seule fois. Les blocs qui se répètent sont remplacés par des références pointant vers les blocs déjà sauvegardés.
+- **Chunk** : Un chunk appelé "bloc" en français est un bloc de données représentant une portion d'information découpée d'un ensemble plus grand (*un fichier par exemple*). L'objectif des chunks est de faciliter les opérations de transfert, de stockage, etc. 
+  - Exemple : Imaginons qu'un paquet de sucre représente un fichier, et que ce paquet de sucre contient 50 morceaux de sucres de 4 couleurs différentes (bleu, rouge, brun, blanc). Un morceau de sucre représente un **chunk**. Si je veux sauvegarder ce fichier sans déduplication, je devrai copier tous les 50 morceaux, même si plusieurs sont identiques. Mais avec la déduplication, je n'ai besoin de sauvegarder que les **morceaux distincts** (bleu, rouge, brun, blanc), leur **nombre respectif**, et leur **position** dans le paquet. Par exemple, au lieu de sauvegarder 50 morceaux, je note simplement qu'il y a :
+    -	*8 morceaux bruns aux positions : 1,5,6,8,15,17,18,19*
+    -	*15 morceaux bleu aux positions : 3,4,etc.*
+
+  
 ## Architecture
 
 Le projet comprend quatres modules :
