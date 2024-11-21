@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <getopt.h>
 #include "file_handler.h"
 #include "deduplication.h"
 #include "backup_manager.h"
