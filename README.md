@@ -59,44 +59,47 @@ Le programme dispose de plusieurs options :
 
 ### L'option `--backup`
 
-`backup` commence par effectuer une copie complète de la dernière sauvegarde, par liens durs, avec la date et l'heure actuelles comme nom, sous le format `"YYYY-MM-DD-hh:mm:ss.sss"` où :
+L'option `backup` va permettre de faire des sauvegarde incrémentale d'un répertoire que ce soit localement ou vers un serveur distant. Pour cela :
 
-- `YYYY` est l'année sur 4 chiffres
-- `MM` est le mois, entre 01 et 12
-- `DD` est le jour, entre 01 et 31
-- `hh` est l'heure, entre 00 et 23
-- `mm` sont les minutes, entre 00 et 59
-- `ss.sss` sont les secondes et les millisecondes, entre 00.000 et 59.999
+1. Le programme vérifie si le chemin de la sauvegarde spécifié existe et est accessible. Si le chemin est sur un serveur, il établit une connexion via les sockets.
+2. Le programme commence par effectuer une copie complète de la dernière sauvegarde, par liens durs, avec la date et l'heure actuelles comme nom, sous le format `"YYYY-MM-DD-hh:mm:ss.sss"` où :
+	- `YYYY` est l'année sur 4 chiffres
+	- `MM` est le mois, entre 01 et 12
+	- `DD` est le jour, entre 01 et 31
+	- `hh` est l'heure, entre 00 et 23
+	- `mm` sont les minutes, entre 00 et 59
+	- `ss.sss` sont les secondes et les millisecondes, entre 00.000 et 59.999
 
-S'il n'existe pas de sauvegarde précédente (i.e. c'est la première sauvegarde), le programme crée simplement un répertoire avec ce nom et un fichier `.backup_log` à la racine du dossier `/path/to/destination`.
+	S'il n'existe pas de sauvegarde précédente (i.e. c'est la première sauvegarde), le programme crée simplement un répertoire avec ce nom et un fichier `.backup_log` à la racine du dossier `/path/to/destination`.
 
-Cette première étape a donc pour effet que :
-- la sauvegarde de la source `/path/to/source` dans `/path/to/destination` soit en réalité située dans le répertoire `/path/to/destination/YYYY-MM-DD-hh:mm:ss.sss` où les champs du dernier répertoire sont remplacés par la date et l'heure réelles.
-- le fichier `.backup_log` soit rempli avec les informations concernant les fichiers dédupliqué qui ont été sauvegardé de même que leur md5 ligne par ligne. Chaque ligne est structurée comme suit : `YYYY-MM-DD-hh:mm:ss.sss/folder1/file1:mtime:md5` où :
-	- `YYYY-MM-DD-hh:mm:ss.sss` est le nom du répertoire de sauvegarde
- 	- `mtime` est la date de dernière modification de ce fichier
- 	- `md5` est la somme md5 du fichier dédupliqué
+	Cette première étape a donc pour effet que :
+	- la sauvegarde de la source `/path/to/source` dans `/path/to/destination` soit en réalité située dans le répertoire `/path/to/destination/YYYY-MM-DD-hh:mm:ss.sss` où les champs du dernier répertoire sont remplacés par la date et l'heure réelles.
+	- le fichier `.backup_log` soit rempli avec les informations concernant les fichiers dédupliqué qui ont été sauvegardé de même que leur md5 ligne par ligne. Chaque ligne est structurée comme suit : `YYYY-MM-DD-hh:mm:ss.sss/folder1/file1:mtime:md5` où :
+		- `YYYY-MM-DD-hh:mm:ss.sss` est le nom du répertoire de sauvegarde
+ 		- `mtime` est la date de dernière modification de ce fichier
+ 		- `md5` est la somme md5 du fichier dédupliqué
 
-Pour les prochaines sauvegardes, le programme vérifie le contenu du fichier `.backup_log` en suivant les règles ci-dessous (pour chaque changement, le fichier `.backup_log` est mis à jour :
+3. Pour les prochaines sauvegardes, le programme vérifie le contenu du fichier `.backup_log` en suivant les règles ci-dessous (pour chaque changement, le fichier `.backup_log` est mis à jour :
 
-- un dossier dans la source est créé quand il n'existe pas dans la destination
-- un dossier dans la destination est supprimé quand il n'existe pas dans la source
-- un fichier dans la source, mais pas dans la destination, est copié dans la destination
-- un fichier dans la source et dans la destination est copié si :
-	- la date de modification est postérieure dans la source et le contenu est différent
-	- la taille est différente et le contenu est différent
-- un fichier de la destination est supprimé s'il n'existe plus dans la source
-- à la fin de la sauvegarde, le fichier `.backup_log` mis à jour est copié dans le répertoire de la sauvegarde
+	- un dossier dans la source est créé quand il n'existe pas dans la destination
+	- un dossier dans la destination est supprimé quand il n'existe pas dans la source
+	- un fichier dans la source, mais pas dans la destination, est copié dans la destination
+	- un fichier dans la source et dans la destination est copié si :
+		- la date de modification est postérieure dans la source et le contenu est différent
+		- la taille est différente et le contenu est différent
+	- un fichier de la destination est supprimé s'il n'existe plus dans la source
+	- à la fin de la sauvegarde, le fichier `.backup_log` mis à jour est copié dans le répertoire de la sauvegarde
 
 ### L'option `--restore`
 L'option `--restore` permet de restaurer une sauvegarde à partir d'un chemin spécifié, que ce soit localement ou depuis un serveur distant. La restauration peut être effectuée en utilisant les informations sur la sauvegarde disponible dans le répertoire de destination ou à travers une connexion réseau.
 
-1. Le programme vérifie si le chemin de la sauvegarde spécifié existe et est accessible. Si le chemin est sur un serveur, il établit une connexion via les sockets. 
-2. Les fichiers de la sauvegarde sont extraits et copiés dans le répertoire de destination spécifié, ou dans le répertoire par défaut si aucune destination n'est fournie.
-3. Si un fichier restauré existe déjà dans la destination, le programme effectue les vérifications suivantes avant de remplacer le fichier :
+1. Le programme vérifie si le chemin de la sauvegarde spécifié existe et est accessible. Si le chemin est sur un serveur, il établit une connexion via les sockets.
+2. Le programme parcours le fichier `.backup_log` présent dans le répertoire de la sauvegarde
+3. Sur la base des chemins présents dans le fichier, le programme copie les fichiers de la sauvegarde dans le répertoire de destination spécifié, ou dans le répertoire par défaut (répertoire courant de l'utilisateur) si aucune destination n'est fournie.
+4. Si un fichier restauré existe déjà dans la destination, le programme effectue les vérifications suivantes avant de remplacer le fichier :
 	- Si la date de modification du fichier source est postérieure à celle du fichier de destination, il est remplacé.
  	- Si la taille des fichiers diffère, le fichier de destination est également remplacé.
-4. Le programme notifie l'utilisateur du succès ou des échecs de chaque opération de restauration. Si l'option `--verbose` est activée, il affiche des messages détaillés.
+5. Le programme notifie l'utilisateur du succès ou des échecs de chaque opération de restauration. Si l'option `--verbose` est activée, il affiche des messages détaillés (durée de la restauration).
 
 ### L'option `--list-backups`
 L'option `--list-backups` permet d'afficher toutes les sauvegardes existantes, que ce soit localement ou sur un serveur distant. Cette fonctionnalité est utile pour que l'utilisateur puisse voir toutes les sauvegardes disponibles et décider laquelle restaurer.
