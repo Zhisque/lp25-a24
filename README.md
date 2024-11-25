@@ -74,7 +74,7 @@ L'option `backup` va permettre de faire des sauvegarde incrémentale d'un réper
 
 	Cette première étape a donc pour effet que :
 	- la sauvegarde de la source `/path/to/source` dans `/path/to/destination` soit en réalité située dans le répertoire `/path/to/destination/YYYY-MM-DD-hh:mm:ss.sss` où les champs du dernier répertoire sont remplacés par la date et l'heure réelles.
-	- le fichier `.backup_log` soit rempli avec les informations concernant les fichiers dédupliqué qui ont été sauvegardé de même que leur md5 ligne par ligne. Chaque ligne est structurée comme suit : `YYYY-MM-DD-hh:mm:ss.sss/folder1/file1:mtime:md5` où :
+	- le fichier `.backup_log` soit rempli avec les informations concernant les fichiers dédupliqué qui ont été sauvegardé de même que leur md5 ligne par ligne. Chaque ligne est structurée comme suit : `YYYY-MM-DD-hh:mm:ss.sss/folder1/file1;mtime;md5` où :
 		- `YYYY-MM-DD-hh:mm:ss.sss` est le nom du répertoire de sauvegarde
  		- `mtime` est la date de dernière modification de ce fichier
  		- `md5` est la somme md5 du fichier dédupliqué
