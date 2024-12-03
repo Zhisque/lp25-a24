@@ -1,11 +1,16 @@
 #include <stdio.h>
 #include "file_handler.h"
 
+int is_directory(const char *path) {
+    //Renvoie si le chemin en paramètre est un répertoire existant
+}
+
+
 void list_files(const char *path) {
     // Implémenter la logique pour lister les fichiers dans le répertoire donné
 }
 
-void read_file(const char *filepath) {
+char *read_file(const char *filepath) {
     // Implémenter la logique pour lire un fichier
 }
 
