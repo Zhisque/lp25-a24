@@ -26,14 +26,25 @@ log_t read_backup_log(const char *logfile){
             fclose(file);
             return logs;
         }
-        char md5_str[MD5_DIGEST_LENGTH * 2 + 1];
-        new_element->date = malloc(20);
 
-        sscanf(line, "%ms %s %19s", &new_element->path, md5_str, new_element->date);
-
-        for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
-            sscanf(md5_str + i * 2, "%2hhx", &new_element->md5[i]);
+        char *token;
+        token = strtok(line, ";")
+        new_element->path = malloc(strlen(token) + 1);
+        if (!new_element->path) {
+            perror("Failed to allocate memory");
+            fclose(file);
+            return logs;
         }
+        new_element->path = token;
+        token = strtok(line, ";")
+        new_element->date = malloc(strlen(token) + 1);
+        if (!new_element->date) {
+            perror("Failed to allocate memory");
+            fclose(file);
+            return logs;
+        }
+        new_element->date = token;
+        new_element->md5 = line;
 
         new_element->next = NULL;
         new_element->prev = logs.tail;
