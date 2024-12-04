@@ -28,6 +28,7 @@ void write_log_element(log_element *elt, FILE *logfile){
    * @param: elt - un élément log à écrire sur une ligne
    *         logfile - le chemin du fichier .backup_log
    */
+
 }
 
 void list_files(const char *path){

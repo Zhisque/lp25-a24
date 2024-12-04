@@ -19,7 +19,6 @@ typedef struct {
     log_element *tail; // Fin de la liste de log
 } log_t;
 
-
 log_t read_backup_log(const char *logfile);
 void update_backup_log(const char *logfile, log_t *logs);
 void write_log_element(log_element *elt, FILE *logfile);

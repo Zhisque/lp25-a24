@@ -13,6 +13,10 @@ int main(int argc, char *argv[]) {
     // Implémentation de la logique de sauvegarde et restauration
     // Exemples : gestion des options --backup, --restore, etc.
     
+    char str_date[20];
+    get_str_time(str_date);
+
+    printf("%s\n",str_date);
+
     return EXIT_SUCCESS;
 }
-
