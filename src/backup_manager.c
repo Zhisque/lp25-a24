@@ -31,18 +31,12 @@ void create_backup(const char *source_dir, const char *backup_dir) {
     char str_date[20]; 
     get_str_time(str_date);
     
-    char *log = malloc(strlen(backup_dir) + strlen(".backup_log") + 1);
-    log = strcat(strcpy(log, backup_dir),".backup_log");
-    FILE *back_up_log = fopen(log,"r");
-    if (back_up_log == NULL) {
-        //Première backup
-    } else {
-        //Nouvelle backup
-    }
-    DIR *source = opendir(source_dir);
+    char *log_path = malloc(strlen(backup_dir) + strlen(".backup_log") + 1);
+    log_path = strcat(strcpy(log_path, backup_dir),".backup_log");
 
-    fclose(back_up_log);
-    closedir(source);
+    log_t logs;
+
+    update_backup_log(log_path, logs);
 }
 
 // Fonction permettant d'enregistrer dans fichier le tableau de chunk dédupliqué
