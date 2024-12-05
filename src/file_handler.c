@@ -15,7 +15,7 @@ log_t read_backup_log(const char *logfile){
     log_t logs = {NULL, NULL};
     FILE *file = fopen(logfile, "r");
     if (!file) {
-        perror("Failed to open backup_log");
+        perror("Erreur lors de l'ouverture du fichier .backup_log");
         return logs;
     }
     char line[256];
@@ -63,11 +63,69 @@ log_t read_backup_log(const char *logfile){
 
 // Fonction permettant de mettre à jour une ligne du fichier .backup_log
 void update_backup_log(const char *logfile, log_t *logs){
-  /* Implémenter la logique de modification d'une ligne du fichier ".bakcup_log"
-  * @param: logfile - le chemin vers le fichier .backup_log
-  *         logs - qui est la liste de toutes les lignes du fichier .backup_log sauvegardée dans une structure log_t
-  */
+    /* Implémenter la logique de modification d'une ligne du fichier ".bakcup_log"
+    * @param: logfile - le chemin vers le fichier .backup_log
+    *         logs - qui est la liste de toutes les lignes du fichier .backup_log sauvegardée dans une structure log_t
+    */
+    FILE *file = fopen(logfile, "r");
+    if (!file) {
+        perror("Erreur lors de l'ouverture du fichier .backup_log");
+        return;
+    }
+    FILE *temp_file = fopen("temp_backup_log", "w");
+    if (!temp_file) {
+        perror("Erreur lors de la création du fichier temporaire");
+        fclose(file);
+        return;
+    }
 
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        char path[256];
+        sscanf(line, "%255s", path);
+
+        // Vérifie si ce chemin existe dans `logs`
+        log_element *current = logs->head;
+        int found = 0;
+        while (current) {
+            if (strcmp(path, current->path) == 0) {
+                // Écrit l'élément mis à jour dans le fichier temporaire
+                write_log_element(current, temp_file);
+                found = 1;
+                break;
+            }
+            current = current->next;
+        }
+
+        // Si l'élément n'est pas trouvé, il est ignoré (supprimé)
+    }
+
+    // Ajoute les nouveaux éléments qui n'étaient pas dans l'ancien log
+    log_element *current = logs->head;
+    while (current) {
+        int found = 0;
+        rewind(file); // Parcourt à nouveau l'ancien fichier
+        while (fgets(line, sizeof(line), file)) {
+            char path[256];
+            sscanf(line, "%255s", path);
+
+            if (strcmp(path, current->path) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            write_log_element(current, temp_file);
+        }
+        current = current->next;
+    }
+
+    fclose(file);
+    fclose(temp_file);
+
+    // Remplace l'ancien fichier par le fichier temporaire
+    remove(logfile);
+    rename("temp_backup_log", logfile);
 }
 
 void write_log_element(log_element *elt, FILE *logfile){
