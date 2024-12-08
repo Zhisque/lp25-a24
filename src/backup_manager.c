@@ -8,35 +8,47 @@
 #include <time.h>
 #include <sys/stat.h>
 
-void get_str_time(char *buffer) {
-    struct timespec tp;
-    time_t now = time(NULL);
-    strftime(buffer, 20, "%Y-%m-%d-%H:%M:%S", localtime(&now));
-}
-
 // Fonction pour créer une nouvelle sauvegarde complète puis incrémentale
 void create_backup(const char *source_dir, const char *backup_dir) {
     /* @param: source_dir est le chemin vers le répertoire à sauvegarder
     *          backup_dir est le chemin vers le répertoire de sauvegarde
     */
     struct stat info;
-    if (!is_directory(source_dir)) {
-        perror("Le répertoire source est invalide");
-        return;
-    } else if (!is_directory(backup_dir)) {
-        perror("Le répertoire de sauvegarde est invalide");
+
+    char str_date[20]; 
+    struct timespec tp;
+    time_t now = time(NULL);
+    strftime(str_date, 20, "%Y-%m-%d-%H:%M:%S", localtime(&now));
+    
+    if (strlen(backup_dir) > 1011) {
+        perror("Directory name is too long!");
         return;
     }
 
-    char str_date[20]; 
-    get_str_time(str_date);
-    
-    char *log_path = malloc(strlen(backup_dir) + strlen(".backup_log") + 1);
-    log_path = strcat(strcpy(log_path, backup_dir),".backup_log");
+    char log_path[1024];
+    strcpy(log_path, backup_dir);
+    strcat(log_path, "/.backup_log");
 
-    log_t logs;
+    log_t existing_logs = read_backup_log(log_path), new_logs;
+    new_logs.head = new_logs.tail = NULL;
 
-    update_backup_log(log_path, logs);
+    DIR *source = opendir(source_dir);
+    if (source == NULL) {
+        perror("Source directory does not exist");
+        return;
+    }
+
+    struct dirent *file = readdir(source);
+    while (file != NULL) {
+        log_element *element = existing_logs.tail;
+        while (element != NULL && strcmp(element->path, file->d_name)) {
+            
+            element = element->prev;
+        }
+        file = readdir(source);
+    }
+
+    update_backup_log(log_path, &new_logs);
 }
 
 // Fonction permettant d'enregistrer dans fichier le tableau de chunk dédupliqué
