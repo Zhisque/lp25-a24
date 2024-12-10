@@ -133,6 +133,13 @@ void write_log_element(log_element *elt, FILE *logfile){
    * @param: elt - un élément log à écrire sur une ligne
    *         logfile - le chemin du fichier .backup_log
    */
+   if (!elt || !logfile) {
+        fprintf(stderr, "Paramètres invalides pour write_log_element\n");
+        return;
+    }
+
+    // Écrit l'élément dans le fichier
+    fprintf(logfile, "%s %s %s\n", elt->path, elt->md5, elt->date);
 }
 
 void list_files(const char *path){
