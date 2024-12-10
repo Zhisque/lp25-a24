@@ -132,6 +132,7 @@ void write_restored_file(const char *output_filename, Chunk *chunks, int chunk_c
         return;
     }
 
+    //IS DIR ???
     FILE *output_file = fopen(output_filename, "w");
     if (!output_file) {
         perror("Error opening file restoring backup");
@@ -159,5 +160,5 @@ void restore_backup(const char *backup_id, const char *restore_dir) {
         return;
     }
 
-    //
+    //A CONTINUER
 }
