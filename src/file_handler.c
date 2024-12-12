@@ -3,6 +3,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include "file_handler.h"
 #include "deduplication.h"
 
@@ -22,7 +23,7 @@ log_t read_backup_log(const char *logfile){
     while (fgets(line, sizeof(line), file)) {
         log_element *new_element = malloc(sizeof(log_element));
         if (!new_element) {
-            perror("Failed to allocate memory");
+            perror("Echec lors de l'allocution de memoire");
             fclose(file);
             return logs;
         }
@@ -31,7 +32,7 @@ log_t read_backup_log(const char *logfile){
         token = strtok(line, ";")
         new_element->path = malloc(strlen(token) + 1);
         if (!new_element->path) {
-            perror("Failed to allocate memory");
+            perror("Echec lors de l'allocution de memoire");
             fclose(file);
             return logs;
         }
@@ -39,7 +40,7 @@ log_t read_backup_log(const char *logfile){
         token = strtok(line, ";")
         new_element->date = malloc(strlen(token) + 1);
         if (!new_element->date) {
-            perror("Failed to allocate memory");
+            perror("Echec lors de l'allocution de memoire");
             fclose(file);
             return logs;
         }
@@ -133,18 +134,52 @@ void write_log_element(log_element *elt, FILE *logfile){
    * @param: elt - un élément log à écrire sur une ligne
    *         logfile - le chemin du fichier .backup_log
    */
-   if (!elt || !logfile) {
-        fprintf(stderr, "Paramètres invalides pour write_log_element\n");
+    if (!elt || !logfile) {
+        perror("Paramètres invalides pour write_log_element");
         return;
     }
 
     // Écrit l'élément dans le fichier
-    fprintf(logfile, "%s %s %s\n", elt->path, elt->md5, elt->date);
+    fprintf(logfile, "%s;%s;%s\n", elt->path, elt->date, elt->md5);
 }
 
-void list_files(const char *path){
-  /* Implémenter la logique pour lister les fichiers présents dans un répertoire
-  */
+void list_files(const char *path) {
+    /* Implémenter la logique pour lister les fichiers présents dans un répertoire
+    */
+    DIR *dir = opendir(path);
+    struct dirent *elem;
+    if (!dir) {
+        perror("Erreur lors de l'ouverture du dossier");
+    }
+
+    while ((elem=readdir(dir)) != NULL) {
+        if (strcmp(elem->d_name, ".") == 0 || strcmp(elem->d_name, "..") == 0) {
+            continue;
+        }
+
+        // Construire le chemin complet
+        char full_path[1024];
+        snprintf(full_path, sizeof(full_path), "%s/%s", path, elem->d_name);
+
+        // Vérifier si c'est un fichier ou un répertoire
+        struct stat path_stat;
+        if (stat(full_path, &path_stat) == -1) {
+            perror("Erreur lors de la récupération des informations sur le fichier");
+            continue;
+        }
+
+        if (S_ISDIR(path_stat.st_mode)) {
+            // Si c'est un répertoire, appeler récursivement
+            printf("Chemin : %s\n", full_path);
+            list_files(full_path);
+        } else {
+            // Si c'est un fichier, l'afficher
+            printf("Fichier : %s\n", full_path);
+        }
+    }
+
+    // Fermer le répertoire
+    closedir(dir);
 }
 
 
