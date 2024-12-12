@@ -40,22 +40,29 @@ void create_backup(const char *source_dir, const char *backup_dir) {
 
     struct dirent *file = readdir(source);
     while (file != NULL) {
+        struct stat file_stat;
+        if (stat(file->d_name, &file_stat) != 0) {
+            perror("Stat failed, probable file does not exist");
+            continue;
+        }
+
         log_element *element = existing_logs.head;
         while (element != NULL && strcmp(element->path, file->d_name)) {
             element = element->next;
         }
-        unsigned char md5_file[MD5_DIGEST_LENGTH];
-        //JSP
-        if (element == NULL) {
-            //Fichier non existant dans la cible
-            log_element *new_element = malloc(sizeof(log_element));
-            new_element->path = malloc(sizeof(file->d_name+1));
-            strcpy(new_element->path, file->d_name);
-            strcpy(new_element->md5, md5_file);
+        
+        if (S_ISREG(file_stat.st_mode)) {
+            if (element == NULL) {
+                //Fichier non existant dans la cible
+                log_element *new_element = malloc(sizeof(log_element));
+                new_element->path = malloc(sizeof(file->d_name+1));
+                strcpy(new_element->path, file->d_name);
+                //Pour chaque md5 record
+                strcpy(new_element->md5, );
+            } else if (element->date == file_stat.st_mtime) {
 
-        } /*else if (element->date) {
-
-        }   Pas fini :(    */
+            }
+        }
 
 
         file = readdir(source);
@@ -87,7 +94,7 @@ void write_backup_file(const char *output_filename, Chunk *chunks, int chunk_cou
 
 
 // Fonction implémentant la logique pour la sauvegarde d'un fichier
-void backup_file(const char *filename) {
+void backup_file(const char *filename, const char *output_filename) {
     if (filename == NULL) {
         perror("Invalid arguments");
         return;
@@ -131,8 +138,7 @@ void write_restored_file(const char *output_filename, Chunk *chunks, int chunk_c
         perror("Invalid arguments");
         return;
     }
-
-    //IS DIR ???
+    
     FILE *output_file = fopen(output_filename, "w");
     if (!output_file) {
         perror("Error opening file restoring backup");
@@ -161,4 +167,5 @@ void restore_backup(const char *backup_id, const char *restore_dir) {
     }
 
     //A CONTINUER
+
 }
