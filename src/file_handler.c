@@ -126,7 +126,7 @@ void update_backup_log(const char *logfile, log_t *logs){
 
     // Remplace l'ancien fichier par le fichier temporaire
     remove(logfile);
-    rename("temp_backup_log", logfile);
+    rename(".backup_log", temp_file);
 }
 
 void write_log_element(log_element *elt, FILE *logfile){
