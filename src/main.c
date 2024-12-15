@@ -19,49 +19,49 @@ int main(int argc, char *argv[]) {
 		{.name="restore",.has_arg=0,.flag=0,.val='r'},
 		{.name="list-backups",.has_arg=0,.flag=0,.val='l'},
 		{.name="dry-run",.has_arg=0,.flag=0,.val='u'},
-        {.name="d-server",.has_arg=1,.flag=0,.val='w'},
-        {.name="d-port",.has_arg=1,.flag=0,.val='x'},
-        {.name="s-server",.has_arg=1,.flag=0,.val='y'},
-        {.name="s-port",.has_arg=1,.flag=0,.val='z'},
-        {.name="dest",.has_arg=1,.flag=0,.val='d'},
-        {.name="source",.has_arg=1,.flag=0,.val='s'},
-        {.name="verbose",.has_arg=0,.flag=0,.val='v'},
+        	{.name="d-server",.has_arg=1,.flag=0,.val='w'},
+        	{.name="d-port",.has_arg=1,.flag=0,.val='x'},
+        	{.name="s-server",.has_arg=1,.flag=0,.val='y'},
+        	{.name="s-port",.has_arg=1,.flag=0,.val='z'},
+        	{.name="dest",.has_arg=1,.flag=0,.val='d'},
+        	{.name="source",.has_arg=1,.flag=0,.val='s'},
+        	{.name="verbose",.has_arg=0,.flag=0,.val='v'},
 		{.name=0,.has_arg=0,.flag=0,.val=0}, // last element must be zero
 	};
 	while((opt = getopt_long(argc, argv, "", my_opts, NULL)) != -1) {
 		switch (opt) {
 			case 'b':
-            case 'r':
+            		case 'r':
 			case 'l':
 				if (mode == ' ') { 
-                    mode = opt;
-                } else { 
-                    perror("Cannot use different modes");
-                    return EXIT_FAILURE;
-                }
+                    			mode = opt;
+                		} else { 
+                    			perror("Cannot use different modes");
+                    			return EXIT_FAILURE;
+                		}
 				break;
 			case 'u':
 				dry_run = 1;
 				break;
-            case 'w':
+            		case 'w':
 				strcpy(dest_serv, optarg);
 				break;
-            case 'x':
+            		case 'x':
 				sscanf(optarg, "%d", &dest_serv_port);
 				break;
-            case 'y':
+            		case 'y':
 				strcpy(source_serv, optarg);
 				break;
-            case 'z':
+            		case 'z':
 				sscanf(optarg, "%d", &source_serv_port);
 				break;
-            case 'd':
+            		case 'd':
 				strcpy(dest, optarg);
 				break;
-            case 's':
+            		case 's':
 				strcpy(source, optarg);
 				break;
-            case 'v':
+            		case 'v':
 				verbose = 1;
 				break;
 			default:

@@ -49,7 +49,9 @@ log_t read_backup_log(const char *logfile){
             return logs;
         }
         new_element->date = token;
-        strcpy(new_element->md5,line);
+
+        strcpy(new_element->md5, line);
+
 
         new_element->next = NULL;
         new_element->prev = logs.tail;
