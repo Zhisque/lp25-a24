@@ -50,9 +50,10 @@ void add_md5(Md5Entry *hash_table, unsigned char *md5, int index) {
 }
 
 
-void deduplicate_file(FILE *file, Chunk *chunks, Md5Entry *hash_table){
+int deduplicate_file(FILE *file, Chunk *chunks, Md5Entry *hash_table){
     unsigned char buffer[CHUNK_SIZE];
     int chunk_index = 0, j = 0;
+    int nbr_chunk = 0;
     size_t lecture_chunk;
 
     // Initialiser la table de hachage avec des -1
@@ -62,11 +63,13 @@ void deduplicate_file(FILE *file, Chunk *chunks, Md5Entry *hash_table){
 
     while ((lecture_chunk = fread(buffer, sizeof(unsigned long), CHUNK_SIZE, file)) > 0) {
 
+        nbr_chunk++; // calculer le nombre de chunks
+        
         unsigned char md5[MD5_DIGEST_LENGTH];
         compute_md5(buffer, lecture_chunk, md5);
 
         while (j < chunk_index && memcmp(chunks[j].md5, md5, MD5_DIGEST_LENGTH) != 0){
-            j++;
+            j++; //parcourir pour trouver chunk non unique
         }
         if (memcmp(chunks[j].md5, md5, MD5_DIGEST_LENGTH) == 0) { // il existe deja !
             // ajout dans table de hashage
@@ -93,6 +96,7 @@ void deduplicate_file(FILE *file, Chunk *chunks, Md5Entry *hash_table){
         printf("probleme dans la lecture du fichier");
         return;
     }
+    return nbr_chunk;
 }
 
 
