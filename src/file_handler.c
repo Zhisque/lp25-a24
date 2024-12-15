@@ -29,7 +29,7 @@ log_t read_backup_log(const char *logfile){
         }
 
         char *token;
-        token = strtok(line, ";")
+        token = strtok(line, ";");
         new_element->path = malloc(strlen(token) + 1);
         if (!new_element->path) {
             perror("Echec lors de l'allocution de memoire");
@@ -37,7 +37,7 @@ log_t read_backup_log(const char *logfile){
             return logs;
         }
         new_element->path = token;
-        token = strtok(line, ";")
+        token = strtok(line, ";");
         new_element->date = malloc(strlen(token) + 1);
         if (!new_element->date) {
             perror("Echec lors de l'allocution de memoire");
@@ -45,7 +45,7 @@ log_t read_backup_log(const char *logfile){
             return logs;
         }
         new_element->date = token;
-        new_element->md5 = line;
+        strcpy(new_element->md5,line);
 
         new_element->next = NULL;
         new_element->prev = logs.tail;
