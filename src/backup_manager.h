@@ -10,6 +10,8 @@
 #include <time.h>
 #include <sys/stat.h>
 
+// Renvoie l'heure actuelle sous format YYYY-MM-DD-hh:mm:ss
+void get_str_time(char *buffer);
 // Fonction pour créer un nouveau backup incrémental
 void create_backup(const char *source_dir, const char *backup_dir);
 // Fonction pour restaurer une sauvegarde
