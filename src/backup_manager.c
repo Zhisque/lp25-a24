@@ -148,7 +148,7 @@ void backup_file(const char *filename, const char *output_filename) {
 }
 
 // Fonction permettant la restauration du fichier backup via le tableau de chunk
-void write_restored_file(const char *output_filename, Chunk *chunks, int chunk_count) {
+void write_restored_file(const char *output_filename, Chunk *chunks, Md5Entry *hash_table, int chunk_count) {
     if (output_filename == NULL || chunks == NULL || chunk_count == 0) {
         perror("Invalid arguments");
         return;
@@ -161,7 +161,7 @@ void write_restored_file(const char *output_filename, Chunk *chunks, int chunk_c
     }
 
     for (int i = 0; i < chunk_count; ++i) {
-        if (fwrite(&chunks[i], sizeof(void), CHUNK_SIZE, output_file) != 1) {
+        if (fwrite(&chunks[hash_table[i].index], sizeof(void), CHUNK_SIZE, output_file) != 1) {
             perror("Error writing file during restoration");
             fclose(output_file);
             return;
