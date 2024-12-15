@@ -148,20 +148,20 @@ void backup_file(const char *filename, const char *output_filename) {
 }
 
 // Fonction permettant la restauration du fichier backup via le tableau de chunk
-void write_restored_file(const char *output_filename, Chunk *chunks, int chunk_count) {
+void write_restored_file(const char *output_filename, Chunk *chunks, Md5Entry *hash_table, int chunk_count) {
     if (output_filename == NULL || chunks == NULL || chunk_count == 0) {
         perror("Invalid arguments");
         return;
     }
     
-    FILE *output_file = fopen(output_filename, "w");
+    FILE *output_file = fopen(output_filename, "wb");
     if (!output_file) {
         perror("Error opening file restoring backup");
         return;
     }
 
     for (int i = 0; i < chunk_count; ++i) {
-        if (fwrite(&chunks[i], sizeof(void), CHUNK_SIZE, output_file) != 1) {
+        if (fwrite(&chunks[hash_table[i].index], sizeof(void), CHUNK_SIZE, output_file) != 1) {
             perror("Error writing file during restoration");
             fclose(output_file);
             return;
@@ -180,7 +180,26 @@ void restore_backup(const char *backup_id, const char *restore_dir) {
         perror("Invalid arguments");
         return;
     }
+    
+    char log_path[1024];
+    strcpy(log_path, backup_id);
+    strcat(log_path, "/.backup_log");
 
-    //A CONTINUER
+    log_t logs = {NULL, NULL};
+    logs = read_backup_log(log_path);
 
+    log_element *elem = logs.head;
+    while (elem != NULL) {
+        if (elem->md5 == 0) {
+            //Convention pour un dossier
+            char dir_path[1024];
+            strcpy(dir_path, restore_dir);
+            //YYYY-MM-DD-hh:mm:ss -> 19         YYYY-MM-DD-hh:mm:ss.sss -> 23
+            strcat(dir_path, &elem->path[19]);
+            mkdir(dir_path, 755);
+        } else {
+            //Enoooooorme flemme D:
+        }
+        elem = elem->next;
+    }
 }

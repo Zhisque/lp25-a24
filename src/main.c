@@ -10,15 +10,14 @@
 int main(int argc, char *argv[]) {
     // Analyse des arguments de la ligne de commande
 
-    // Implémentation de la logique de sauvegarde et restauration
-    // Exemples : gestion des options --backup, --restore, etc.
-    char mode = ' ', source[1024] = "", dest[1024] = "", source_serv[1024], dest_serv[1024];
-	int verbose = 0, source_serv_port = -1, dest_serv_port = -1;
+    char mode = ' ', source[1024] = "", dest[1024] = "", source_serv[1024] = "", dest_serv[1024] = "";
+	int verbose = 0, dry_run = 0, source_serv_port = -1, dest_serv_port = -1;
 
     int opt = 0;
 	struct option my_opts[] = {
 		{.name="backup",.has_arg=0,.flag=0,.val='b'},
 		{.name="restore",.has_arg=0,.flag=0,.val='r'},
+		{.name="list-backups",.has_arg=0,.flag=0,.val='l'},
 		{.name="dry-run",.has_arg=0,.flag=0,.val='u'},
         {.name="d-server",.has_arg=1,.flag=0,.val='w'},
         {.name="d-port",.has_arg=1,.flag=0,.val='x'},
@@ -33,13 +32,16 @@ int main(int argc, char *argv[]) {
 		switch (opt) {
 			case 'b':
             case 'r':
-			case 'u':
+			case 'l':
 				if (mode == ' ') { 
                     mode = opt;
                 } else { 
                     perror("Cannot use different modes");
                     return EXIT_FAILURE;
                 }
+				break;
+			case 'u':
+				dry_run = 1;
 				break;
             case 'w':
 				strcpy(dest_serv, optarg);
@@ -68,6 +70,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	
+    // Implémentation de la logique de sauvegarde et restauration
 	if (source_serv[0] == '\0' ^ source_serv_port == -1) {
 		perror("Must give both server adress and port for source");
 		return EXIT_FAILURE;
@@ -77,7 +80,32 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	//A continuer
+	switch (mode) {
+		case 'b':
+			if (source[0] == '\0' || dest[0] == '\0') {
+				perror("Both source and destination needed for backup: use --source and --dest");
+				break;
+			}
+			create_backup(source, dest);
+			break;
+		case 'r':
+			if (source[0] == '\0' || dest[0] == '\0') {
+				perror("Both source and destination needed for restoration: use --source and --dest");
+				break;
+			}
+			restore_backup(source, dest);
+			break;
+		case 'l':
+			if (source[0] == '\0') {
+				perror("Source needed for listing: use --source");
+				break;
+			}
+			list_backups(source);
+			break;
+		default:
+			perror("One mode needed: use --backup --restore or --list_backups");
+			break;
+	}
 
     return EXIT_SUCCESS;
 }
