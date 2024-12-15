@@ -37,6 +37,10 @@ log_t read_backup_log(const char *logfile){
             return logs;
         }
         new_element->path = token;
+
+        token = strtok(line, ";");
+        sscanf(token,"%zu",new_element->taille);
+        
         token = strtok(line, ";");
         new_element->date = malloc(strlen(token) + 1);
         if (!new_element->date) {
@@ -94,7 +98,7 @@ void write_log_element(log_element *elt, FILE *logfile){
     }
 
     // Écrit l'élément dans le fichier
-    fprintf(logfile, "%s;%s;%s\n", elt->path, elt->date, elt->md5);
+    fprintf(logfile, "%s;%s;%s;%s\n", elt->path, elt->taille, elt->date, elt->md5);
 }
 
 void list_files(const char *path) {
