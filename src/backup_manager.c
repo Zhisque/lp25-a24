@@ -148,7 +148,7 @@ void backup_file(const char *filename, const char *output_filename) {
 }
 
 // Fonction permettant la restauration du fichier backup via le tableau de chunk
-void write_restored_file(const char *output_filename, Chunk *chunks, Md5Entry *hash_table, int chunk_count) {
+void write_restored_file(const char *output_filename, Chunk *chunks, int chunk_count) {
     if (output_filename == NULL || chunks == NULL || chunk_count == 0) {
         perror("Invalid arguments");
         return;
@@ -161,7 +161,7 @@ void write_restored_file(const char *output_filename, Chunk *chunks, Md5Entry *h
     }
 
     for (int i = 0; i < chunk_count; ++i) {
-        if (fwrite(&chunks[hash_table[i].index], sizeof(void), CHUNK_SIZE, output_file) != 1) {
+        if (fwrite(&chunks[i], sizeof(void), CHUNK_SIZE, output_file) != 1) {
             perror("Error writing file during restoration");
             fclose(output_file);
             return;
@@ -198,7 +198,20 @@ void restore_backup(const char *backup_id, const char *restore_dir) {
             strcat(dir_path, &elem->path[19]);
             mkdir(dir_path, 755);
         } else {
-            //Enoooooorme flemme D:
+            char backup_filepath[1024];
+            strcpy(backup_filepath, backup_id);
+            strcat(backup_filepath, "/");
+            strcat(backup_filepath, elem->path);
+
+            FILE *backup_file = fopen(backup_filepath, "rb");
+            Chunk *chunks = NULL;
+            int chunk_count = 0;
+            undeduplicate_file(backup_file, &chunks, &chunk_count);
+
+            char output_filepath[1024];
+            strcpy(output_filepath, backup_id);
+            strcat(output_filepath, &elem->path[19]);
+            write_restored_file(output_filepath, chunks, chunk_count);
         }
         elem = elem->next;
     }
