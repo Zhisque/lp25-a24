@@ -198,7 +198,20 @@ void restore_backup(const char *backup_id, const char *restore_dir) {
             strcat(dir_path, &elem->path[19]);
             mkdir(dir_path, 755);
         } else {
-            //Enoooooorme flemme D:
+            char backup_filepath[1024];
+            strcpy(backup_filepath, backup_id);
+            strcat(backup_filepath, "/");
+            strcat(backup_filepath, elem->path);
+
+            FILE *backup_file = fopen(backup_filepath, "rb");
+            Chunk *chunks = NULL;
+            int chunk_count = 0;
+            undeduplicate_file(backup_file, &chunks, &chunk_count);
+
+            char output_filepath[1024];
+            strcpy(output_filepath, backup_id);
+            strcat(output_filepath, &elem->path[19]);
+            write_restored_file(output_filepath, chunks, chunk_count);
         }
         elem = elem->next;
     }
