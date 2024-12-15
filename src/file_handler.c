@@ -37,6 +37,10 @@ log_t read_backup_log(const char *logfile){
             return logs;
         }
         new_element->path = token;
+
+        token = strtok(line, ";");
+        sscanf(token,"%zu",new_element->taille);
+        
         token = strtok(line, ";");
         new_element->date = malloc(strlen(token) + 1);
         if (!new_element->date) {
@@ -45,7 +49,9 @@ log_t read_backup_log(const char *logfile){
             return logs;
         }
         new_element->date = token;
+
         strcpy(new_element->md5, line);
+
 
         new_element->next = NULL;
         new_element->prev = logs.tail;
@@ -94,7 +100,7 @@ void write_log_element(log_element *elt, FILE *logfile){
     }
 
     // Écrit l'élément dans le fichier
-    fprintf(logfile, "%s;%s;%s\n", elt->path, elt->date, elt->md5);
+    fprintf(logfile, "%s;%s;%s;%s\n", elt->path, elt->taille, elt->date, elt->md5);
 }
 
 void list_files(const char *path) {
@@ -126,7 +132,8 @@ void list_files(const char *path) {
             // Si c'est un répertoire, appeler récursivement
             printf("Chemin : %s\n", full_path);
             list_files(full_path);
-        } else {
+        }
+        else {
             // Si c'est un fichier, l'afficher
             printf("Fichier : %s\n", full_path);
         }
@@ -136,4 +143,21 @@ void list_files(const char *path) {
     closedir(dir);
 }
 
-
+void ajout_log(log_t *log, const char *path, unsigned char *md5, size_t taille, char *date){
+    log_element new_elem = malloc(sizeof(log_element));
+    if (!log_element) {
+        perror("Erreur lors de l'ajout d'un nouvel element");
+        return;
+    }
+    new_elem->path = malloc(sizeof(const char));
+    strcpy(new_elem->path,path);
+    new_elem->md5 = malloc(sizeof(unsigned char));
+    strcpy(new_elem->md5,md5);
+    new_elem->taille = taille;
+    new_elem->date = malloc(sizeof(char));
+    strcpy(new_elem->date,date);
+    new_elem->next = NULL;
+    new_elem->prev = log->tail;
+    (log->tail)->next = new_elem;
+    log_tail = new_elem;
+}
