@@ -61,10 +61,9 @@ int deduplicate_file(FILE *file, Chunk *chunks, Md5Entry *hash_table){
         hash_table[i].index = -1;
     }
 
-    while ((lecture_chunk = fread(buffer, sizeof(unsigned long), CHUNK_SIZE, file)) > 0) {
-
+    while ((lecture_chunk = fread(buffer, 1, CHUNK_SIZE, file)) > 0) {
         nbr_chunk++; // calculer le nombre de chunks
-        
+
         unsigned char md5[MD5_DIGEST_LENGTH];
         compute_md5(buffer, lecture_chunk, md5);
 
@@ -74,27 +73,25 @@ int deduplicate_file(FILE *file, Chunk *chunks, Md5Entry *hash_table){
         if (memcmp(chunks[j].md5, md5, MD5_DIGEST_LENGTH) == 0) { // il existe deja !
             // ajout dans table de hashage
             add_md5(hash_table, md5, j);
-
-            chunk_index++;
-        }
-        else{
+        } else {
             // nouveau dans table de chunks unique
+            chunks = realloc(chunks, sizeof(Chunk) * (chunk_index + 1));
             chunks[chunk_index].data = malloc(lecture_chunk);
             memcpy(chunks[chunk_index].data, buffer, lecture_chunk);
             memcpy(chunks[chunk_index].md5, md5, MD5_DIGEST_LENGTH);
 
             // nouveau dans table de hashage
-            add_md5(hash_table, md5, chunk_index);
+            add_md5(hash_table, md5, j);
 
             chunk_index++;
         }
     }
     if (feof(file)){
-        return; // fin fichier valide
+        return nbr_chunk; // fin fichier valide
     }
     else if (ferror(file)){
         printf("probleme dans la lecture du fichier");
-        return;
+        return -1;
     }
     return nbr_chunk;
 }
@@ -102,7 +99,6 @@ int deduplicate_file(FILE *file, Chunk *chunks, Md5Entry *hash_table){
 
 void undeduplicate_file(FILE *file, Chunk **chunks, int *chunk_count) {
     Md5Entry hash_table[HASH_TABLE_SIZE]; // creation d une nouvelle table de hashage
-    int chunk_index = 0; // Index pour le tableau chunks
 
     //compte du nombre de chunks unique
     fread(chunk_count, sizeof(int), 1, file);
@@ -112,7 +108,6 @@ void undeduplicate_file(FILE *file, Chunk **chunks, int *chunk_count) {
     for (int i = 0; i < HASH_TABLE_SIZE; i++) {
         hash_table[i].index = -1; // Initialiser les espaces vide avec -1
     }
-
 
     int current_chunk_index = 0; // Index pour remplir le tableau chunks
     for (int i = 0; i < *chunk_count; i++) {
