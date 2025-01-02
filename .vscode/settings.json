@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "stdlib.h": "c",
-        "stat.h": "c",
-        "time.h": "c"
-    },
-    "makefile.configureOnOpen": false
-}

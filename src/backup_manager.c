@@ -80,7 +80,7 @@ void write_backup_file(const char *output_filename, Chunk *chunks, Md5Entry *has
 // Fonction implémentant la logique pour la sauvegarde d'un fichier
 void backup_file(const char *filename, const char *output_filename, log_t *old_logs, log_t *new_logs) {
     if (filename == NULL) {
-        perror("Invalid arguments");
+        perror("Invalid argument for filename");
         return;
     }
     struct stat file_stat;
@@ -90,14 +90,23 @@ void backup_file(const char *filename, const char *output_filename, log_t *old_l
     }
 
     if (S_ISDIR(file_stat.st_mode)) {
+        printf("Backing up directory %s into %s\n", filename, output_filename);
+        mkdir(output_filename, 755);
+
+        //Ajouter mtime pour l'instant ça marche pas
+        unsigned char *zero = "0";
+        ajout_log(new_logs, filename, zero, (size_t) file_stat.st_size, "");
+        printf("Directory successfully added to logs\n");
+
         DIR *dir = opendir(filename);
-
-        mkdir(filename, 755);
-        ajout_log(new_logs, filename, 0, file_stat.st_size, file_stat.st_mtime);
-
         struct dirent *subfile = readdir(dir);
         char subfilename[1024], output_subfilename[1024];
         while (subfile != NULL) {
+            if (strcmp(subfile->d_name, ".") == 0 || strcmp(subfile->d_name, "..") == 0) {
+                subfile = readdir(dir);
+                continue;
+            }
+            printf("Prepping for %s\n", subfile->d_name);
             strcpy(subfilename, filename);
             strcpy(output_subfilename, output_filename);
             strcat(subfilename, "/");
@@ -105,62 +114,70 @@ void backup_file(const char *filename, const char *output_filename, log_t *old_l
             strcat(subfilename, subfile->d_name);
             strcat(output_subfilename, subfile->d_name);
 
+            printf("Prep finished\n");
             backup_file(subfilename, output_subfilename, old_logs, new_logs);
 
-            readdir(subfile);
+            subfile = readdir(dir);
         }
+        printf("Directory %s finished\n", filename);
         closedir(dir);
     } else if (S_ISREG(file_stat.st_mode)) {
-        FILE *file = fopen(filename, "r");
+        printf("Backing up file %s into %s\n", filename, output_filename);
+        //Ouvrir le fichier
+        FILE *file = fopen(filename, "rb");
         if (!file) {
             perror("Error opening file starting backup");
             return;
         }
-
+        
+        //Chercher le fichier dans les anciens logs
         int is_same = 1;
         log_element *element = old_logs->head;
         while (element != NULL && strcmp(&element->path[FIRST_SLASH], filename)) {
+            printf("%s\n", &element->path[FIRST_SLASH]);
             element = element->next;
         }
+        if (element != NULL) printf("%s\n", &element->path[FIRST_SLASH]);
+        else printf("empty\n");
 
+        //Chercher les différences entre source et log
+        
         Chunk *chunks = NULL;
-        Md5Entry *hash_table = NULL;
+        Md5Entry hash_table[HASH_TABLE_SIZE];
         int chunk_count = 0;
-        if (element != NULL && element->date == file_stat.st_mtime && element->size == file_stat.st_size) {
-            FILE *subfile = fopen(filename, "rb");
-            chunk_count = deduplicate_file(subfile, chunks, hash_table);
+        if (element != NULL && element->date == file_stat.st_mtime && element->size == (size_t) file_stat.st_size) {
+            //Vérifier les Chunks
+            chunk_count = deduplicate_file(file, chunks, hash_table);
             for (int i = 0; i < chunk_count; ++i) {
                 log_element *elementMD5 = old_logs->head;
-                while (elementMD5 != NULL && strcmp(&elementMD5->path[FIRST_SLASH], filename) && strcmp(&elementMD5->md5, hash_table[i].md5)) {
+                while (elementMD5 != NULL) {
+                    if (strcmp(&elementMD5->path[FIRST_SLASH], filename) == 0 && strcmp(&elementMD5->md5, hash_table[i].md5) == 0) {
+                        is_same = 0;
+                        break;
+                    }
                     elementMD5 = elementMD5->next;
                 }
-                if (elementMD5 == NULL) {
-                    is_same = 0;
-                    break;
-                }
             }
-            fclose(subfile);
         } else {
             is_same = 0;
-            FILE *subfile = fopen(filename, "rb");
-            chunk_count = deduplicate_file(subfile, chunks, hash_table);
-            fclose(subfile);
+            chunk_count = deduplicate_file(file, chunks, hash_table);
         }
-
+        printf("SAME: %d", is_same);
+        
         if (is_same) {
-            ajout_log(new_logs, element->path, element->md5, element->size, element->md5);
+            ajout_log(new_logs, element->path, element->md5, element->size, element->date);
         } else {
             write_backup_file(output_filename, chunks, hash_table, chunk_count);
-            ajout_log(new_logs, output_filename, element->md5, element->size, element->md5);
+            ajout_log(new_logs, output_filename, element->md5, element->size, element->date);
         }
         
-        deduplicate_file(file, chunks, hash_table);
+        //deduplicate_file(file, chunks, hash_table);
 
-        write_backup_file(output_filename, chunks, hash_table, sizeof(chunks));
-
+        //write_backup_file(output_filename, chunks, hash_table, sizeof(chunks));
+        
         fclose(file);
     } else {
-        perror("Unknown file type");
+        printf("Unknown file type for %s", filename);
     }
 }
 
@@ -232,4 +249,26 @@ void restore_backup(const char *backup_id, const char *restore_dir) {
         }
         elem = elem->next;
     }
+}
+
+// Fonction permettant de lister les différentes sauvegardes présentes dans la destination
+void list_backups(const char *backup_dir) {
+    struct dirent *entry;
+    DIR *directory = opendir(backup_dir);
+
+    if (directory == NULL) {
+        perror("Unable to open directory");
+        return;
+    }
+
+    printf("Existing backups in %s :\n", backup_dir);
+    while ((entry = readdir(directory)) != NULL) {
+        // Exclude ".", "..", and ".logfile"
+        if (entry->d_name[0] == '.') {
+            continue;
+        }
+        printf("%s\n", entry->d_name);
+    }
+
+    closedir(directory);
 }
