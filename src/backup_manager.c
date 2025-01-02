@@ -153,9 +153,7 @@ void backup_file(const char *filename, const char *output_filename, log_t *old_l
             write_backup_file(output_filename, chunks, hash_table, chunk_count);
             ajout_log(new_logs, output_filename, element->md5, element->size, element->md5);
         }
-
-        Md5Entry *hash_table = NULL;
-        Chunk *chunks = NULL;
+        
         deduplicate_file(file, chunks, hash_table);
 
         write_backup_file(output_filename, chunks, hash_table, sizeof(chunks));
