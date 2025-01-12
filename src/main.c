@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 	}
 	
     // Implémentation de la logique de sauvegarde et restauration
-	if ((source_serv[0] == '\0') ^ (source_serv_port == -1)) {
+	if (source_serv[0] == '\0' && source_serv_port == -1) {
 		perror("Must give both server adress and port for source");
 		return EXIT_FAILURE;
 	}

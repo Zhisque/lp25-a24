@@ -39,7 +39,8 @@ log_t read_backup_log(const char *logfile){
         new_element->path = token;
 
         token = strtok(line, ";");
-        sscanf(token,"%zu", &new_element->size);
+      
+        sscanf(token,"%zu",&new_element->taille);
         
         token = strtok(line, ";");
         new_element->date = malloc(strlen(token) + 1);
@@ -99,7 +100,7 @@ void write_log_element(log_element *elt, FILE *logfile){
     }
 
     // Écrit l'élément dans le fichier
-    fprintf(logfile, "%s;%zu;%s;%s\n", elt->path, elt->size, elt->date, elt->md5);
+    fprintf(logfile, "%s;%ld;%s;%s\n", elt->path, elt->taille, elt->date, elt->md5);
 }
 
 void list_files(const char *path) {
@@ -144,6 +145,7 @@ void list_files(const char *path) {
 
 void ajout_log(log_t *log, const char *path, unsigned char *md5, size_t taille, char *date){
     log_element *new_elem = malloc(sizeof(log_element));
+
     if (!new_elem) {
         perror("Erreur lors de l'ajout d'un nouvel element");
         return;
