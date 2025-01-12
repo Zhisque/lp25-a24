@@ -1,5 +1,4 @@
 #include "network.h"
-#include <stdlib.h>
 
 void send_data(const char *server_address, int port, const void *data, size_t size) {
     // Implémenter la logique d'envoi de données à un serveur distant
@@ -95,3 +94,57 @@ void receive_data(int port, void **data, size_t *size) {
     close(server_sock);
 }
 
+size_t receive_data(int port, size_t size) {
+    int server_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_sock < 0) {
+        perror("Erreur dans la création de socket");
+        return 0;
+    }
+
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    inet_pton(AF_INET, "0.0.0.0", &(server_addr.sin_addr)) ;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(port);
+    memset(&(server_addr.sin_zero), 0, sizeof(server_addr.sin_zero));
+
+    // Lier le socket à l'adresse et au port
+    if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Erreur dans la liaison du socket à l'adresse et au port");
+        close(server_sock);
+        return 0;
+    }
+
+    // Écouter les connexions entrantes
+    if (listen(server_sock, 1) < 0) {
+        perror("Erreur lors de l'écoute du serveur");
+        close(server_sock);
+        return 0;
+    }
+
+    printf("En attente d'une connexion sur le port %d...\n", port);
+
+    // Accepter une connexion
+    int client_sock = accept(server_sock, NULL, NULL);
+    if (client_sock < 0) {
+        perror("Erreur lors de l'acceptation de la connexion");
+        close(server_sock);
+        return 0;
+    }
+
+    // Recevoir des données
+    char buffer[size];
+    ssize_t bytes_received = recv(client_sock, buffer, sizeof(buffer), 0);
+    if (bytes_received < 0) {
+        perror("Erreur dans la réception des données");
+        close(client_sock);
+        close(server_sock);
+        return 0;
+    }
+
+    // Si des données ont bien été récupérées, elles sont retournées pour être sauvegardées/écrites
+    close(client_sock);
+    close(server_sock);
+
+    return bytes_received;
+}

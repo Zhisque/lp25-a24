@@ -39,6 +39,7 @@ log_t read_backup_log(const char *logfile){
         new_element->path = token;
 
         token = strtok(line, ";");
+      
         sscanf(token,"%zu",&new_element->taille);
         
         token = strtok(line, ";");
@@ -49,7 +50,8 @@ log_t read_backup_log(const char *logfile){
             return logs;
         }
         new_element->date = token;
-        strcpy(new_element->md5,line);
+
+        strcpy(new_element->md5, line);
 
         new_element->next = NULL;
         new_element->prev = logs.tail;
@@ -75,7 +77,7 @@ void update_backup_log(const char *logfile, log_t *logs){
     FILE *file = fopen(logfile, "w");
     if (!file) {
         perror("Erreur lors de l'ouverture du fichier .backup_log");
-        return logs;
+        return;
     }
 
     log_element *current = logs->head;
@@ -142,20 +144,22 @@ void list_files(const char *path) {
 }
 
 void ajout_log(log_t *log, const char *path, unsigned char *md5, size_t taille, char *date){
-    log_element new_elem = malloc(sizeof(log_element));
+    log_element *new_elem = malloc(sizeof(log_element));
+
     if (!new_elem) {
         perror("Erreur lors de l'ajout d'un nouvel element");
         return;
     }
-    new_elem->path = malloc(sizeof(const char));
-    strcpy(new_elem->path,path);
-    new_elem->md5 = malloc(sizeof(unsigned char));
-    strcpy(new_elem->md5,md5);
-    new_elem->taille = taille;
+    new_elem->path = malloc(sizeof(const char) * 1024);
+    strcpy(new_elem->path, path);
+    strcpy(new_elem->md5, md5);
+    new_elem->size = taille;
     new_elem->date = malloc(sizeof(char));
     strcpy(new_elem->date,date);
     new_elem->next = NULL;
     new_elem->prev = log->tail;
-    (log->tail)->next = new_elem;
-    log_tail = new_elem;
+    if (log->tail){
+        log->tail->next = new_elem;
+    }
+    log->tail = new_elem;
 }

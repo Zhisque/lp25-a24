@@ -10,6 +10,9 @@
 #include <time.h>
 #include <sys/stat.h>
 
+//YYYY-MM-DD-hh:mm:ss -> 19         YYYY-MM-DD-hh:mm:ss.sss -> 23
+#define FIRST_SLASH 19
+
 // Renvoie l'heure actuelle sous format YYYY-MM-DD-hh:mm:ss
 void get_str_time(char *buffer);
 // Fonction pour créer un nouveau backup incrémental
