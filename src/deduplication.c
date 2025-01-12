@@ -18,11 +18,7 @@ unsigned int hash_md5(unsigned char *md5) {
 
 
 void compute_md5(void *data, size_t len, unsigned char *md5_out) {
-    MD5_CTX md5; // creer
-    MD5_Init(&md5); // initialiser struct
-    MD5_Update(&md5, data, len); // inserer donnee
-    MD5_Final(md5_out, &md5); // Finito pipo
-    // ou ? MD5((unsigned char *)data, len, md5_out);
+    MD5((unsigned char *)data, len, md5_out);
 }
 
 

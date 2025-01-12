@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 
 // Fonction pour créer une nouvelle sauvegarde complète puis incrémentale
-void create_backup(const char *source_dir, const char *backup_dir) {
+void create_backup(char *source_dir, char *backup_dir) {
     /* @param: source_dir est le chemin vers le répertoire à sauvegarder
     *          backup_dir est le chemin vers le répertoire de sauvegarde
     */
